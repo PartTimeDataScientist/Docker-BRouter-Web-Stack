@@ -1,0 +1,13 @@
+FROM nginx:stable
+
+ENV BROUTER_WEB_VERSION 0.18.1
+
+RUN apt-get update -y && \
+    apt-get install -y --no-install-recommends wget unzip && \
+    apt-get clean -y && \
+    rm -rf /var/lib/apt/lists/* 
+
+RUN mkdir -p /usr/app && \
+    wget "https://github.com/nrenner/brouter-web/releases/download/${BROUTER_WEB_VERSION}/brouter-web.${BROUTER_WEB_VERSION}.zip" -O /usr/app/brouter-web.zip && \
+    unzip -o /usr/app/brouter-web.zip -d /usr/share/nginx/html  && \
+    rm -rf /usr/app/brouter-web.zip 

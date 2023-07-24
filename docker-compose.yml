@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  brouter:
+    build:
+      context: .
+      dockerfile: Dockerfile-BRouter
+      args:
+        progress: plain
+    container_name: brouter
+    ports:
+      - 17777:17777
+    volumes:
+      - ./profiles:/usr/app/profiles2      
+      - ./segments:/usr/app/segments
+    restart: 'unless-stopped'
+  brouter-web:
+    build:
+      context: .
+      dockerfile: Dockerfile-BRouterWeb
+      args:
+        progress: plain
+    container_name: brouter-web
+    ports:
+      - 8080:80
+    volumes:
+    - ./config/config.js:/usr/share/nginx/html/config.js
+    - ./config/keys.js:/usr/share/nginx/html/keys.js
+    - ./profiles:/usr/share/nginx/html/profiles2
+    restart: 'unless-stopped'
