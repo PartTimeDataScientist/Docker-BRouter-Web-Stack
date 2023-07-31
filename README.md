@@ -19,4 +19,4 @@ Once you have finished downloading the OSM segments and adapted the config files
 >docker-compose up -d
 ```
 
-Once the containers are running the BRouter routing API is available on port 17777 and the Brouter-Web interface on port 8080
+Once the containers are running the BRouter routing API is available on port 17777 and the Brouter-Web interface on port 8080.

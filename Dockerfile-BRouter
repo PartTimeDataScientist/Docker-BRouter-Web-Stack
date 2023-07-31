@@ -1,21 +1,29 @@
 FROM eclipse-temurin:20-jre-jammy
 
-ENV BROUTER_VERSION 1.7.2
+ARG USER=${USER:-appuser}
+ARG USERNAME=${USER}
+ARG USER_ID=${USER_ID:-1000}
+ARG GROUP_ID=${GROUP_ID:-1000}
+ARG BROUTER_VERSION=1.7.2
 
 RUN apt-get update -y && \
     apt-get install -y --no-install-recommends unzip && \
     apt-get clean -y && \
     rm -rf /var/lib/apt/lists/* 
 
-RUN mkdir -p /usr/app && \
-    wget https://github.com/abrensch/brouter/releases/download/v${BROUTER_VERSION}/brouter-${BROUTER_VERSION}.zip -O /usr/app/brouter.zip && \
+RUN groupadd -r -g ${GROUP_ID} ${USERNAME} && \
+    useradd ${USERNAME} -r -m -d ${HOME} -s /bin/bash -u ${USER_ID} -g ${USERNAME} && \
+    mkdir -p /usr/app && \
+    chown -R ${USER_ID}:${GROUP_ID} /usr/app
+
+USER ${USER}
+
+RUN wget https://github.com/abrensch/brouter/releases/download/v${BROUTER_VERSION}/brouter-${BROUTER_VERSION}.zip -O /usr/app/brouter.zip && \
     unzip /usr/app/brouter.zip -d /usr/app && \
     rm -rf /usr/app/brouter.zip 
 
 WORKDIR /usr/app
 
 EXPOSE 17777
-
-#CMD ls -laR /usr/app
 
 CMD java -Xmx128M -Xms128M -Xmn8M -DmaxRunningTime=300 -cp "/usr/app/brouter-${BROUTER_VERSION}/brouter-${BROUTER_VERSION}-all.jar" btools.server.RouteServer /usr/app/segments /usr/app/profiles2 customprofiles 17777 1

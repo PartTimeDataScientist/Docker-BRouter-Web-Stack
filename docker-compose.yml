@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile-BRouter
       args:
-        progress: plain
+        - "--progress plain"
     container_name: brouter
     ports:
       - 17777:17777
@@ -13,17 +13,22 @@ services:
       - ./profiles:/usr/app/profiles2      
       - ./segments:/usr/app/segments
     restart: 'unless-stopped'
+    command: java ${JAVAOPTS:-"-Xmx128M -Xms12M -Xmn8M"} -DmaxRunningTime=300 -cp "/usr/app/brouter-${BROUTER_VERSION}/brouter-${BROUTER_VERSION}-all.jar" btools.server.RouteServer /usr/app/segments /usr/app/profiles2 customprofiles 17777 4000
   brouter-web:
     build:
       context: .
       dockerfile: Dockerfile-BRouterWeb
       args:
-        progress: plain
+        - "--progress plain"
+        - "UID=${UID:-1000}"
+        - "GID=${GID:-1000}"
     container_name: brouter-web
     ports:
-      - 8080:80
+      - 8080:8080
     volumes:
-    - ./config/config.js:/usr/share/nginx/html/config.js
-    - ./config/keys.js:/usr/share/nginx/html/keys.js
-    - ./profiles:/usr/share/nginx/html/profiles2
+      - ./config/config.js:/usr/share/nginx/html/config.js
+      - ./config/keys.js:/usr/share/nginx/html/keys.js
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+      - ./config/default.conf:/etc/nginx/conf.d/default.conf
+      - ./profiles:/usr/share/nginx/html/profiles2
     restart: 'unless-stopped'
